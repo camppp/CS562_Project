@@ -56,5 +56,6 @@ int main() {
     // Print the command history
     print_history();
 
+    
     return 0;
 }
