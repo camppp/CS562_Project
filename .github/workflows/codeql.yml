@@ -53,7 +53,7 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
-        queries: security-and-quality
+        queries: security-extended,security-and-quality
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
@@ -61,12 +61,14 @@ jobs:
         # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
+    - if: matrix.language == 'c-cpp' || matrix.language == 'csharp'
+      name: Autobuild
+      uses: github/codeql-action/autobuild@v2
     - if: matrix.language == 'java-kotlin'
-      name: build Java code
-      id: build_java_code
-      run:
-        ./mvnw package
-      working-directory: Source/Service/RPSLS.JavaPlayer.Api/
+      name: Build Java
+      run: |
+        make bootstrap
+        make release
 
 
     # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
