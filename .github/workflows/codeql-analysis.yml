@@ -77,6 +77,21 @@ jobs:
     #     echo "Run, Build Application using script"
     #     ./location_of_script_within_repo/buildscript.sh
 
+    - name: Install dependencies
+      run: sudo apt-get install libboost-dev libpoco-dev libwxbase3.0-dev libfmt-dev git cmake doxygen
+
+    - name: Install Paho C client
+      run: cd && git clone https://github.com/eclipse/paho.mqtt.c.git && cd paho.mqtt.c && cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON && sudo cmake --build build/ --target install && sudo ldconfig
+
+    - name: Install Paho C++ client
+      run: cd && git clone https://github.com/eclipse/paho.mqtt.cpp.git && cd paho.mqtt.cpp && cmake -Bbuild -H. -DPAHO_WITH_SSL=ON -DPAHO_BUILD_DOCUMENTATION=TRUE && sudo cmake --build build/ --target install && sudo ldconfig
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Compile project
+      run: make && make install
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
