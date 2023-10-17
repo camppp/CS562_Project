@@ -1,0 +1,182 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 'Test Java'
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    paths:
+    - .github/workflows/test-lang-java.yml
+    - lang/java/**
+    - pom.xml
+
+defaults:
+  run:
+    working-directory: lang/java
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Java ${{ matrix.java }} Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java:
+        - '8'
+        - '11'
+        - '17'
+        - '21-ea'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Local Maven Repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Temurin JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+
+      - name: Lint
+        run: ./build.sh lint
+
+      - name: Test
+        run: ./build.sh test
+
+  interop:
+    name: Java ${{ matrix.java }} Interop
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java:
+        - '8'
+        - '11'
+        - '17'
+        - '21-ea'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Local Maven Repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+
+      - name: Setup Python for Generating Input Data
+        uses: actions/setup-python@v4
+
+      - name: Apt Install Compression Libs Required by Python
+        run: |
+          sudo apt-get install -qqy --no-install-recommends libbz2-dev \
+                                                            liblzma-dev \
+                                                            libsnappy-dev \
+                                                            libzstd-dev
+
+      - name: Install Python Dependencies
+        run: |
+          python3 -m pip install --upgrade pip setuptools tox
+          python3 -m pip install python-snappy zstandard
+
+      - name: Setup C# for Generating Interop Data
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+
+      - name: Install Java Avro for Interop Test
+        working-directory: .
+        run: mvn -B install -DskipTests
+
+      - name: Create Interop Data Directory
+        working-directory: .
+        run: mkdir -p build/interop/data
+
+      - name: Generate Interop Resources
+        working-directory: lang/java/avro
+        run: mvn -B -P interop-data-generate generate-resources
+
+      - name: Generate Interop Data using Python
+        working-directory: lang/py
+        run: ./build.sh interop-data-generate
+
+      - name: Generate Interop Data using C#
+        working-directory: lang/csharp
+        run: ./build.sh interop-data-generate
+
+      - name: Run Interop Tests
+        working-directory: lang/java/ipc
+        run: mvn -B test -P interop-data-test
+
+      - name: Test Reproducible Build
+        working-directory: .
+        run: mvn clean verify -DskipTests -Dcyclonedx.skip artifact:compare
+
+  arm64:
+    name: Java on Linux ARM64
+    runs-on: ["self-hosted", "asf-arm"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Temurin JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+
+      - name: Cache Local Maven Repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build
+        run: |
+          set -x
+          export MAVEN_VERSION="3.9.4"
+          wget https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz
+          tar zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz
+          export M2_HOME=$PWD/apache-maven-$MAVEN_VERSION
+          export PATH="$M2_HOME/bin:$PATH"
+          java -version
+          mvn -version
+          #MAVEN_OPTS="-Dsurefire.excludes=*TestCustomCodec*,*TestAllCodecs*,*TestNettyServer*" ./build.sh clean test
+          ./build.sh clean test
