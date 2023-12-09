@@ -1,3 +1,6 @@
 {
-    "sarif-viewer.connectToGithubCodeScanning": "on"
+    "sarif-viewer.connectToGithubCodeScanning": "on",
+    "files.associations": {
+        "ostream": "cpp"
+    }
 }
