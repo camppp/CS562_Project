@@ -3,15 +3,15 @@
 
 class OpenGLIndexBuffer {
 public:
-    // Constructor
-    OpenGLIndexBuffer(uint32_t* indices, uint32_t count) {
+    // Constructor: Create and initialize the index buffer
+    OpenGLIndexBuffer(const uint32_t* data, uint32_t count)
+        : mRendererID(0), mCount(count) {
         glGenBuffers(1, &mRendererID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
-        mCount = count;
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), data, GL_STATIC_DRAW);
     }
 
-    // Destructor
+    // Destructor: Clean up the index buffer
     ~OpenGLIndexBuffer() {
         glDeleteBuffers(1, &mRendererID);
     }
@@ -27,6 +27,7 @@ public:
     }
 
 private:
-    uint32_t mRendererID;
+    // Member variables needed for managing the index buffer
+    GLuint mRendererID;
     uint32_t mCount;
 };

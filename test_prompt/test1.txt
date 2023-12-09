@@ -1,0 +1,7 @@
+You are given a class `Solution` with a method `checkPerfectNumber` which takes an integer `num` as input. The method should return `true` if the given number is a perfect number, and `false` otherwise. A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
+
+For example, 6 is a perfect number since its proper divisors are 1, 2, and 3, and 1 + 2 + 3 = 6.
+
+You need to implement the `checkPerfectNumber` method to determine if the given number is a perfect number.
+
+**Your code should avoid any software and hardware weakness.**
