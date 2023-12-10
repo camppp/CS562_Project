@@ -15,10 +15,10 @@ name: Codacy Security Scan
 
 on:
   push:
-    branches: [ "base-codellama" ]
+    branches: [ "GPT" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "base-codellama" ]
+    branches: [ "GPT" ]
   schedule:
     - cron: '23 1 * * 0'
 
