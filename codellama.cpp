@@ -1,14 +1,18 @@
-bool copyStringSecurely(const char* source, char* destination) {
-    // Check if the source string is longer than the destination buffer
-    if (strlen(source) > 100) {
-        // Truncate the source string to fit in the destination buffer
-        strncpy(destination, source, 100);
-        // Return false to indicate that the string was truncated
-        return false;
-    } else {
-        // Copy the source string to the destination buffer
-        strcpy(destination, source);
-        // Return true to indicate that the copy was successful without truncation
-        return true;
+#include <iostream>
+
+int main() {
+    int arr[5];
+    int i;
+
+    std::cout << "Enter 5 values: ";
+    for (i = 0; i < 5; i++) {
+        std::cin >> arr[i];
     }
+
+    // Print the array
+    for (i = 0; i < 5; i++) {
+        std::cout << arr[i] << " ";
+    }
+
+    return 0;
 }
