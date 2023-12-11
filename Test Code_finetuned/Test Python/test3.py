@@ -1,0 +1,32 @@
+import unittest
+
+class TestParseNames(unittest.TestCase):
+    def test_parse_names(self):
+        self.assertEqual(parse_names("John Doe"), ["John", "Doe"])
+        self.assertEqual(parse_names("  John Doe  "), ["John", "Doe"])
+        self.assertEqual(parse_names("John\nDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\rDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\n\rDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John  Doe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\tDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\vDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\fDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John  \t  Doe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f"), ["John", "Doe"])
+        self.assertEqual(parse_names("John\t \v\fDoe\n\r\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v\f\t \v
